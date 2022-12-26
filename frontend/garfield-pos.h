@@ -48,6 +48,11 @@ typedef enum /*_TOKEN_ACTION*/ {
 	TOKEN_CONSUME	//discard all tokens up to and including this one
 } TOKEN_ACTION;
 
+typedef enum {
+	TCP_SOCKET,
+	UNIX_SOCKET
+} SOCKET_TYPE;
+
 typedef struct /*_TRANSITION_RESULT*/ {
 	POS_STATE state;
 	TOKEN_ACTION action;
@@ -69,6 +74,7 @@ typedef struct /*_CONNECTION_SPEC*/ {
 	char* host;
 	uint16_t port;
 	CONNECTION_TYPE type;
+	SOCKET_TYPE socket_type;
 	int fd;
 } CONNECTION;
 

@@ -1,3 +1,7 @@
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 void cfg_init(CONFIG* cfg){
 	memset(cfg, 0, sizeof(CONFIG));
 	//memset(&(cfg->db), 0, sizeof(DATABASE));
@@ -16,13 +20,25 @@ void cfg_parse_hostspec(CONNECTION* conn, char* spec){
 	int i;
 
 	//get host part length
-	for(i=0;!isspace(spec[i]);i++){
+	for(i=0;!isspace(spec[i]) && spec[i] != '\0';i++){
 	}
 
-	conn->host=calloc(sizeof(char), i+1);
-	strncpy(conn->host, spec, i);
+	if (!strncmp(spec, "unix://", 7)) {
+		// unix-socket
+		i -= 7;
+		conn->host=calloc(sizeof(char), i + 1);
+		strncpy(conn->host, spec + 7, i);
+		conn->socket_type = UNIX_SOCKET;
+		conn->port = 0;
+	}
+	else {
+		// tcp socket
+		conn->host=calloc(i+1, sizeof(char));
+		strncpy(conn->host, spec, i);
 
-	conn->port=strtoul(spec+i, NULL, 10);
+		conn->port=strtoul(spec+i, NULL, 10);
+		conn->socket_type = TCP_SOCKET;
+	}
 }
 
 void cfg_free(CONFIG* cfg){
